@@ -75,6 +75,7 @@ index = 0 #Initialize the variable index
 tempElement = "" #Initialize the variable tempElement which stores the current element symbol
 if reactant1[0].isnumeric() == True and reactant1[1].isnumeric() == True: #Coefficiant is a two-digit number
     coefficient1 = int(reactant1[0]) * 10 + int(reactant1[1]) #The integer becomes the coefficient
+    index += 2 #Increment the index by 2
 elif reactant1[0].isnumeric() == True: #Checks if the first element of the string is an integer
     coefficient1 = int(reactant1[0]) #The integer becomes the coefficient
     index += 1 #Increment the index value by 1
@@ -122,6 +123,7 @@ if numReactants == 2: #The code runs if numReactants is 2
     tempElement = ""  # Initialize and reset the variable tempElement which stores the current element symbol
     if reactant2[0].isnumeric() == True and reactant2[1].isnumeric() == True: #Coefficient is a two-digit number
         coefficient2 = int(reactant2[0]) * 10 + int(reactant2[1]) #The integer becomes the coefficient
+        index += 2  # Increment the index by 2
     elif reactant2[0].isnumeric() == True:  # Checks if the first element of the string is an integer
         coefficient2 = int(reactant2[0])  # The integer becomes the coefficient
         index += 1  # Increment the index value by 1
@@ -169,6 +171,7 @@ index = 0 #Initialize the variable index
 tempElement = "" #Initialize the variable tempElement which stores the current element symbol
 if product1[0].isnumeric() == True and product1[1].isnumeric() == True: #Coefficient is a two-digit number
     coefficient3 = int(product1[0]) * 10 + int(product1[1]) #The integer becomes the coefficient
+    index += 2  # Increment the index by 2
 elif product1[0].isnumeric() == True: #Checks if the first element of the string is an integer
     coefficient3 = int(product1[0]) #The integer becomes the coefficient
     index += 1 #Increment the index value by 1
@@ -216,6 +219,7 @@ if numProducts == 2: #The code runs if numProducts is 2
     tempElement = ""  # Initialize and reset the variable tempElement which stores the current element symbol
     if product2[0].isnumeric() == True and product2[1].isnumeric() == True: #Coefficient is a two-digit number
         coefficient4 = int(product2[0]) * 10 + int(product2[1]) #The integer becomes the coefficient
+        index += 2  # Increment the index by 2
     elif product2[0].isnumeric() == True:  # Checks if the first element of the string is an integer
         coefficient4 = int(product2[0])  # The integer becomes the coefficient
         index += 1  # Increment the index value by 1
