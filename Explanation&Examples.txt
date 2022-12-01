@@ -29,7 +29,54 @@ C3H8 + 5O2 -> 3CO2 + 4H2O
 Input:
 Enter the number of reactants (Enter 1 or 2): 2
 Enter the number of products (Enter 1 or 2): 2
-Enter the first reactant: C4H10
-Enter the second reactant: O2
-Enter the first product: CO2
-Enter the second product: H2O
+Enter the first reactant: 2C4H10
+Enter the second reactant: 13O2
+Enter the first product: 8CO2
+Enter the second product: 10H2O
+
+Output:
+Your chemical equation is already balanced!
+2C4H10 + 13O2 -> 8CO2 + 10H2O
+
+
+#Case 3
+
+Input:
+Enter the number of reactants (Enter 1 or 2): 2
+Enter the number of products (Enter 1 or 2): 1
+Enter the first reactant: I2
+Enter the second reactant: F2
+Enter the first product: IF7
+
+Output:
+Your chemical reaction is not balanced.
+I2 + 7F2 -> 2IF7
+
+
+#Case 4
+
+Input:
+Enter the number of reactants (Enter 1 or 2): 2
+Enter the number of products (Enter 1 or 2): 2
+Enter the first reactant: 3K2SO4
+Enter the second reactant: 2AlCl3
+Enter the first product: 6KCl
+Enter the second product: Al2(SO4)3
+
+Output:
+Your chemical equation is already balanced!
+3K2SO4 + 2AlCl3 -> 6KCl + Al2(SO4)3
+
+
+#Case 5
+
+Input:
+Enter the number of reactants (Enter 1 or 2): 1
+Enter the number of products (Enter 1 or 2): 2
+Enter the first reactant: 2H2O
+Enter the first product: H2
+Enter the second product: 2O
+
+Output:
+Your chemical equation is not balanced.
+2H2O -> 2H2 + 2O
