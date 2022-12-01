@@ -40,20 +40,32 @@ moles = 1 * coefficient #Initialize the moles value based on the coefficient val
 while index < len(reactant1) and numReactants <= 2: #Loops until index is less than the length of reactant1
     if ord(reactant1[index]) >= 65 and ord(reactant1[index]) <= 90: #The letter is uppercase
         if len(tempElement) > 0: #Checks if the length of tempElement is greater than 0
-            reactantElements.update({tempElement : moles}) #Add the new key and value pair onto the dictionary
+            if tempElement in reactantElements.keys(): #Checks if tempElement is already a key
+                reactantElements[tempElement] += moles #Change the value by moles
+            else: #The element in tempElement is not a key in the dictionary
+                reactantElements.update({tempElement : moles}) #Add the new pair onto the dictionary
         tempElement = "" #Reset the tempElement variable
         moles = 1 * coefficient #Reset the moles value
         tempElement += reactant1[index] #Add the letter to the tempElement string
         if index == len(reactant1) - 1: #Check if the index is the last index of the string
-            reactantElements.update({tempElement: moles}) #Add the new key and value pair onto the dictionary
+            if tempElement in reactantElements.keys(): #Checks if tempElement is already a key
+                reactantElements[tempElement] += moles #Change the value by moles
+            else: #The element in tempElement is not a key in the dictionary
+                reactantElements.update({tempElement: moles}) #Add the new pair onto the dictionary
     elif ord(reactant1[index]) >= 97 and ord(reactant1[index]) <= 122: #The letter is lowercase
         tempElement += reactant1[index] #Add the letter to the tempElement string
         if index == len(reactant1) - 1: #Check if the index is the last index of the string
-            reactantElements.update({tempElement: moles}) #Add the new key and value pair onto the dictionary
+            if tempElement in reactantElements.keys(): #Checks if tempElement is already a key
+                reactantElements[tempElement] += moles #Change the value by moles
+            else: #The element in tempElement is not a key in the dictionary
+                reactantElements.update({tempElement: moles}) #Add the new key and value pair onto the dictionary
     else: #The current element is a subscript number
         moles = int(reactant1[index]) * coefficient #Multiply the subscript number with the coefficient
         if index == len(reactant1) - 1: #Check if the index is the last index of the string
-            reactantElements.update({tempElement: moles}) #Add the new key and value pair onto the dictionary
+            if tempElement in reactantElements.keys(): #Checks if tempElement is already a key
+                reactantElements[tempElement] += moles #Change the value by moles
+            else: #The element in tempElement is not a key in the dictionary
+                reactantElements.update({tempElement: moles}) #Add the new pair onto the dictionary
     index += 1 #Increment the index value by 1
 
 if numReactants == 2: #The code runs if numReactants is 2
@@ -110,20 +122,32 @@ moles = 1 * coefficient #Initialize the moles value based on the coefficient val
 while index < len(product1) and numProducts <= 2: #Loops until index is less than the length of product1
     if ord(product1[index]) >= 65 and ord(product1[index]) <= 90: #The letter is uppercase
         if len(tempElement) > 0: #Checks if the length of tempElement is greater than 0
-            productElements.update({tempElement : moles}) #Add the new key and value pair onto the dictionary
+            if tempElement in productElements.keys(): #Checks if tempElement is already a key
+                productElements[tempElement] += moles #Change the value by moles
+            else: #The element in tempElement is not a key in the dictionary
+                productElements.update({tempElement : moles}) #Add the new key and value pair onto the dictionary
         tempElement = "" #Reset the tempElement variable
         moles = 1 * coefficient #Reset the moles value
         tempElement += product1[index] #Add the letter to the tempElement string
         if index == len(product1) - 1: #Check if the index is the last index of the string
-            productElements.update({tempElement: moles}) #Add the new key and value pair onto the dictionary
+            if tempElement in productElements.keys(): #Checks if tempElement is already a key
+                productElements[tempElement] += moles #Change the value by moles
+            else: #The element in tempElement is not a key in the dictionary
+                productElements.update({tempElement: moles}) #Add the new key and value pair onto the dictionary
     elif ord(product1[index]) >= 97 and ord(product1[index]) <= 122: #The letter is lowercase
         tempElement += product1[index] #Add the letter to the tempElement string
         if index == len(product1) - 1: #Check if the index is the last index of the string
-            productElements.update({tempElement: moles}) #Add the new key and value pair onto the dictionary
+            if tempElement in productElements.keys(): #Checks if tempElement is already a key
+                productElements[tempElement] += moles #Change the value by moles
+            else: #The element in tempElement is not a key in the dictionary
+                productElements.update({tempElement: moles}) #Add the new key and value pair onto the dictionary
     else: #The current element is a subscript number
         moles = int(product1[index]) * coefficient #Multiply the subscript number with the coefficient
         if index == len(product1) - 1: #Check if the index is the last index of the string
-            productElements.update({tempElement: moles}) #Add the new key and value pair onto the dictionary
+            if tempElement in productElements.keys(): #Checks if tempElement is already a key
+                productElements[tempElement] += moles #Change the value by moles
+            else: #The element in tempElement is not a key in the dictionary
+                productElements.update({tempElement: moles}) #Add the new key and value pair onto the dictionary
     index += 1 #Increment the index value by 1
 
 if numProducts == 2: #The code runs if numProducts is 2
@@ -167,6 +191,8 @@ if numProducts == 2: #The code runs if numProducts is 2
                     productElements.update({tempElement: moles}) #Add the new pair onto the dictionary
         index += 1 #Increment the index value by 1
 print(productElements)
+
+
 #Need help on line 170 to line 194
 needCoefficientReactants = {}
 needCoefficientProducts = {}
@@ -220,5 +246,3 @@ if balanced == True: #Runs when the chemical equation is already balanced
         print(reactant1 + " -> " + product1) #Print the statement
     else: #Runs when numReactants is 2 and numProducts is 2
         print(reactant1 + " + " + reactant2 + " -> " + product1 + " + " + product2) #Print the statement
-
-
