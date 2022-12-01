@@ -1,0 +1,1 @@
+From line 7 to line 193 basically ask the user the number of reactants and products in the chemical equation, let the user type the reactants and products, a
