@@ -3,6 +3,7 @@ Notify the user if their equation is balanced or not and then balance the equati
 Author: Johan Nino Espino
 Creation Date: 11/29/2022
 """
+import re
 
 def getUserInput():
     ######################################
@@ -10,12 +11,12 @@ def getUserInput():
     ######################################
     numReactants = input("Enter the number of reactants (Enter 1 or 2): ")
     while not numReactants.isdigit() and numReactants != 1 and numReactants != 2:
-        print('Invalid input\n')
+        print('Invalid input, please try again\n')
         numReactants = input("Enter the number of reactants (Enter 1 or 2): ")
 
     numProducts = input("Enter the number of products (Enter 1 or 2): ")
     while not numProducts.isdigit() and numProducts != 1 and numProducts != 2:
-        print('Invalid input\n')
+        print('Invalid input, please try again\n')
         numProducts = input("Enter the number of products (Enter 1 or 2): ")
     
     ################################
@@ -35,16 +36,198 @@ def getUserInput():
     
     return (reactant_list, product_list)
 
+# For each reactant and product create it's own dictionary, then merge both reactants/products and compare if balance
 def checkChemicalBalance(reactant_list, product_list):
-    print(reactant_list)
-    print(product_list)
+    reactant_dic_list = []
+    for reactant in reactant_list:
+        reactant_dic = createCompoundDictionary(reactant)
+        reactant_dic_list.append(reactant_dic)
+    
+    merge_reactant_dic = mergeCompoundDictionary(reactant_dic_list, 0)
 
+    product_dic_list = []
+    for product in product_list:
+        product_dic = createCompoundDictionary(product)
+        product_dic_list.append(product_dic)
+    
+    merge_product_dic = mergeCompoundDictionary(product_dic_list, 0)
+
+    count = 0
+    for (key, reactant_count) in merge_reactant_dic.items():
+        product_count = merge_product_dic[key]
+        if reactant_count == product_count:
+            count += 1
+    
+    if count == len(merge_reactant_dic):
+        print("Your chemical equation is already balanced!")
+        return True
+    else:
+        print("Your chemical equation is not balanced.")
+    return False
+
+# Merge two compounds dictionary and apply coefficient
+def mergeCompoundDictionary(compound_dic, coefficient):
+    if len(compound_dic) == 1:
+        merge = compound_dic[0]
+        if coefficient > 1:
+            for key in merge:
+                merge[key] *= coefficient
+        return merge
+    
+    merge = {}
+    first_compound = compound_dic[0]
+    second_compound = compound_dic[1]
+
+    for key, value in first_compound.items():
+        if key in merge:
+           merge[key] += value
+        else:
+            merge[key] = value
+
+    for key, value in second_compound.items():
+        if key in merge:
+           merge[key] += value
+        else:
+            merge[key] = value
+
+    if coefficient > 1:
+        for key in merge:
+            merge[key] *= coefficient
+
+    return merge
+
+#Create dictionary for a given compound
+def createCompoundDictionary(compound):
+    (coefficient, compound) = getCoefficient(compound)
+
+    temp_compound = compound.replace('(', ' ')
+    temp_compound = temp_compound.replace(')', ' ')
+    subgroups = createSubgroups(temp_compound.split())
+    subgroups_list = []
+
+    for (subcompound, outer_subscript) in subgroups:
+        subgroup_dic = grabUniqueElementsFromSubCompound(subcompound, int(outer_subscript))
+        subgroups_list.append(subgroup_dic)
+
+    return mergeCompoundDictionary(subgroups_list, int(coefficient))
+
+#Create subgroups for a given compound to handle outer subscripts for parenthesis
+# Ex: compound: (CH4)2              (CO2)4(CH4)2
+#     return: [('CH4', 2)]          [('CO2', 4), ('CH4', 2)]
+def createSubgroups(subcompounds_list):
+    if len(subcompounds_list) == 1:
+        return [(subcompounds_list[0], 1)]
+
+    subgroups = []
+    i = 1
+    while i < len(subcompounds_list):
+        subcompound = subcompounds_list[i-1]
+        outer_subscript = subcompounds_list[i]
+
+        if isinstance(subcompound, str) and outer_subscript.isdigit():
+            subgroups.append((subcompound, outer_subscript))
+            i+=2        
+        else:
+            subgroups.append((subcompound, 1))
+            i+=1
+    return subgroups
+
+def grabUniqueElementsFromSubCompound(subcompound, outer_script):
+    element_dic = {}
+    element_list = [char for char in subcompound if not char.isdigit()]
+
+    if len(element_list) == 1:
+        curr_element = element_list[0]
+        element_dic[element_list[0]] = 1
+        index = subcompound.find(curr_element) + len(curr_element)
+        subscript = grabSubscript(subcompound, index)
+        
+        if subscript > 0:
+                element_dic[curr_element] = subscript
+        return element_dic
+    
+    i = 1
+    while i < len(element_list):
+        prev_char = element_list[i-1]
+        curr_char = element_list[i]
+
+        if prev_char.isupper() and curr_char.islower():
+            curr_element = prev_char + curr_char
+            element_dic[curr_element] = 1
+
+            index = subcompound.find(curr_element) + len(curr_element)
+            subscript = grabSubscript(subcompound, index)
+
+            if subscript > 0:
+                element_dic[curr_element] = subscript
+            
+            if outer_script > 1:
+                element_dic[curr_element] *= int(outer_script)
+                        
+        
+        if prev_char.isupper() and curr_char.isupper():
+            element_dic[prev_char] = 1
+
+            index = subcompound.find(prev_char) + len(prev_char)
+            subscript = grabSubscript(subcompound, index)
+
+            if subscript > 0:
+                element_dic[prev_char] = subscript
+            
+            if outer_script > 1:
+                element_dic[prev_char] *= outer_script
+
+        i+= 1
+    
+    if element_list[-1].isupper():
+        curr_char = element_list[-1]
+        element_dic[curr_char] = 1
+        
+        index = subcompound.find(curr_char) + len(curr_char)
+        
+        if index < len(subcompound):
+            subscript = grabSubscript(subcompound, index)
+
+            if subscript > 0:
+                element_dic[curr_char] = subscript
+            
+        if outer_script > 1:
+            element_dic[curr_char] *= outer_script
+
+
+    return element_dic
+
+def grabSubscript(compound, start_index):
+    end_index = start_index
+    while end_index < len(compound):
+        if not compound[end_index].isdigit():
+            break
+        end_index += 1
+    
+    if start_index == end_index:
+        return 0
+
+    return int(compound[start_index: end_index])
+
+
+
+def getCoefficient(compound):
+    i = 0
+    while i < len(compound):
+        element = compound[i]
+        if element.isdigit():
+            i+=1
+            continue
+        break
+    
+    if i == 0:
+        return (0, compound)
+    return (compound[:i], compound[i:])
 
 if __name__ == "__main__":
     (reactant_list, product_list) = getUserInput()
     checkChemicalBalance(reactant_list, product_list)
-
-
+    #print(item)
 
 
 numReactants = int(input("Enter the number of reactants (Enter 1 or 2): ")) #Ask the number of reactants
