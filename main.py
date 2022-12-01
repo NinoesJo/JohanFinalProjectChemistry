@@ -4,6 +4,49 @@ Author: Johan Nino Espino
 Creation Date: 11/29/2022
 """
 
+def getUserInput():
+    ######################################
+    #Grab number of reactants and products
+    ######################################
+    numReactants = input("Enter the number of reactants (Enter 1 or 2): ")
+    while not numReactants.isdigit() and numReactants != 1 and numReactants != 2:
+        print('Invalid input\n')
+        numReactants = input("Enter the number of reactants (Enter 1 or 2): ")
+
+    numProducts = input("Enter the number of products (Enter 1 or 2): ")
+    while not numProducts.isdigit() and numProducts != 1 and numProducts != 2:
+        print('Invalid input\n')
+        numProducts = input("Enter the number of products (Enter 1 or 2): ")
+    
+    ################################
+    #Grab reactants and products
+    ################################
+    position = ['first', 'second']
+
+    reactant_list = []
+    for i in range(int(numReactants)):
+        reactant = str(input("Enter the " + position[i] + " reactant: "))
+        reactant_list.append(reactant)
+    
+    product_list = []
+    for i in range(int(numProducts)):
+        product = str(input("Enter the " + position[i] + " product: "))
+        product_list.append(product)
+    
+    return (reactant_list, product_list)
+
+def checkChemicalBalance(reactant_list, product_list):
+    print(reactant_list)
+    print(product_list)
+
+
+if __name__ == "__main__":
+    (reactant_list, product_list) = getUserInput()
+    checkChemicalBalance(reactant_list, product_list)
+
+
+
+
 numReactants = int(input("Enter the number of reactants (Enter 1 or 2): ")) #Ask the number of reactants
 numProducts = int(input("Enter the number of products (Enter 1 or 2): ")) #Ask the number of products
 
@@ -246,3 +289,4 @@ if balanced == True: #Runs when the chemical equation is already balanced
         print(reactant1 + " -> " + product1) #Print the statement
     else: #Runs when numReactants is 2 and numProducts is 2
         print(reactant1 + " + " + reactant2 + " -> " + product1 + " + " + product2) #Print the statement
+
