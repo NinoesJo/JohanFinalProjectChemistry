@@ -36,8 +36,7 @@ def getUserInput():
     
     return (reactant_list, product_list)
 
-# For each reactant and product create it's own dictionary, then merge both reactants/products and compare if balance
-def checkChemicalBalance(reactant_list, product_list):
+def grabMergeCompoundDictionary(reactant_list, product_list):
     reactant_dic_list = []
     for reactant in reactant_list:
         reactant_dic = createCompoundDictionary(reactant)
@@ -51,6 +50,12 @@ def checkChemicalBalance(reactant_list, product_list):
         product_dic_list.append(product_dic)
     
     merge_product_dic = mergeCompoundDictionary(product_dic_list, 0)
+
+    return (merge_reactant_dic, merge_product_dic)
+
+# For each reactant and product create it's own dictionary, then merge both reactants/products and compare if balance
+def checkChemicalBalance(reactant_list, product_list):
+    (merge_reactant_dic, merge_product_dic) = grabMergeCompoundDictionary(reactant_list, product_list)
 
     count = 0
     for (key, reactant_count) in merge_reactant_dic.items():
