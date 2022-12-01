@@ -5,7 +5,7 @@ The second half of the program checks if the chemical equation is already balanc
 
 The part that I am struggling on is doing the caluclations to make the equation balance. I initially tried finding the least common multiply and then divide it by the number of moles in the reactant side and the number of moles in the product side for a specific element, but then I realized that this method wouldn't work. 
 
-Currently, I tried to find the algorithm that can do these calculations as well as counting the number of elements when there is a parathesis such as (OH)4.
+Currently, I tried to find the algorithm that can do these calculations as well as counting the number of elements when there is a parathesis such as (OH)4. There is an issue when the subscript is a two-digit number. For example H10 but in the dictionary, it would display as "H" : 0 instead of "H" : 10.
 
 Examples are shown below:
 
