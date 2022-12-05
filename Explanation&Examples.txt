@@ -1,11 +1,3 @@
-From line 7 to line 193 basically ask the user the number of reactants and products in the chemical equation, let the user type the reactants and products
-and then calculate the number moles in each element for the reactants side and then the products side.
-
-The second half of the program checks if the chemical equation is already balanced. If it is true, then it would print "Your chemical equation is already balanced!" and then print out the balanced equation. Else, we would do calculations to find the coefficient that would balance the equation and then print out the correct chemical equation. 
-
-The part that I am struggling on is doing the caluclations to make the equation balance. I initially tried finding the least common multiply and then divide it by the number of moles in the reactant side and the number of moles in the product side for a specific element, but then I realized that this method wouldn't work. 
-
-Currently, I tried to find the algorithm that can do these calculations as well as counting the number of elements when there is a parathesis such as (OH)4.
 
 Examples are shown below:
 
@@ -93,3 +85,13 @@ Enter the second product: 5C2
 Output:
 Your chemical equation is not balanced.
 6Fe3C2 + 12Cu2 -> 6FeCu4 + 3C2
+
+#Case 7
+2
+2
+Na3PO4
+MgPO4
+MgCl2
+NaCl
+Mg3(PO4)2
+
