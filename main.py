@@ -54,20 +54,17 @@ def grabMergeCompoundDictionary(reactant_list, product_list):
     return (merge_reactant_dic, merge_product_dic)
 
 # For each reactant and product create it's own dictionary, then merge both reactants/products and compare if balance
-def checkChemicalBalance(reactant_list, product_list):
-    (merge_reactant_dic, merge_product_dic) = grabMergeCompoundDictionary(reactant_list, product_list)
+def checkChemicalBalance(reactantList, productList):
+    (reactantDictionary, productDictionary) = grabMergeCompoundDictionary(reactantList, productList)
 
-    count = 0
-    for (key, reactant_count) in merge_reactant_dic.items():
-        product_count = merge_product_dic[key]
-        if reactant_count == product_count:
-            count += 1
+    matchCount = 0
+    for (key, reactantCount) in reactantDictionary.items():
+        productCount = productDictionary[key]
+        if reactantCount == productCount:
+            matchCount += 1
     
-    if count == len(merge_reactant_dic):
-        print("Your chemical equation is already balanced!")
+    if matchCount == len(reactantDictionary):
         return True
-    else:
-        print("Your chemical equation is not balanced.")
     return False
 
 # Merge two compounds dictionary and apply coefficient
@@ -210,11 +207,9 @@ def grabSubscript(compound, start_index):
         end_index += 1
     
     if start_index == end_index:
-        return 0
+        return 1
 
     return int(compound[start_index: end_index])
-
-
 
 def getCoefficient(compound):
     i = 0
@@ -226,15 +221,152 @@ def getCoefficient(compound):
         break
     
     if i == 0:
-        return (0, compound)
+        return (1, compound)
     return (compound[:i], compound[i:])
 
+
+def balanceChemicalEquation(reactantList, productList):
+    
+    reactantDictionary, productDictionary = grabMergeCompoundDictionary(reactantList, productList)
+    balance = checkChemicalBalance(reactantList, productList)
+    
+    finalReactantList = reactantList
+    finalProducList = productList
+
+    while not balance:
+        elementListNotBalance = elementsNotBalance(reactantDictionary, productDictionary)
+        elementListNotBalance.sort(key = lambda x: x[1])
+
+        sideWithMore = elementListNotBalance[0][2]
+
+        if sideWithMore == 'reactant':
+            productListUpdate= updateProducts(elementListNotBalance[0], productList)
+            reactantDictionary, productDictionary = grabMergeCompoundDictionary(reactantList, productListUpdate)
+            finalProducList = productListUpdate
+            balance = checkChemicalBalance(reactantList, productListUpdate)
+
+        else:
+            reactantListUpdate = updateReactants(elementListNotBalance[0], reactantList)
+            reactantDictionary, productDictionary = grabMergeCompoundDictionary(reactantListUpdate, productList)
+            finalReactantList = reactantListUpdate
+            balance = checkChemicalBalance(reactantListUpdate, productList)
+        
+        print(finalReactantList, finalProducList)
+        
+    return (finalReactantList, finalProducList)
+
+def updateProducts(element, productList):
+    elementType = element[0]
+    countDifference = element[1]
+
+    for i in range(len(productList)):
+        compound = productList[i]
+        (coefficient, compound) = getCoefficient(compound)
+        
+        if compound.find(elementType) > -1:
+            index = compound.find(elementType) + len(elementType)
+            subscript = grabSubscript(compound, index)
+
+            if subscript > 1:
+                targetCount = subscript*int(coefficient) + countDifference
+                newCompound = compound
+
+                if targetCount%subscript == 0:
+                    newCompound = str(int(targetCount/subscript)) + compound
+                else:
+                    newCompound = str(int(targetCount/subscript) + 1) + compound
+                productList[i] = newCompound
+                break
+
+            newCompound = str(int(coefficient) + countDifference) + compound
+            productList[i] = newCompound
+            break
+
+    return productList
+
+def updateReactants(element, reactantList):
+    elementType = element[0]
+    countDifference = element[1]
+
+    for i in range(len(reactantList)):
+        compound = reactantList[i]
+        (coefficient, compound) = getCoefficient(compound)
+
+        if compound.find(elementType) > -1:
+            index = compound.find(elementType) + len(elementType)
+            subscript = grabSubscript(compound, index)
+
+            if subscript > 1:
+                targetCount = subscript*int(coefficient) + countDifference
+                newCompound = compound
+
+                if targetCount%subscript == 0:
+                    newCompound = str(int(targetCount/subscript)) + compound
+                else:
+                    newCompound = str(int(targetCount/subscript) + 1) + compound
+                reactantList[i] = newCompound
+                break
+
+            newCompound = str(int(coefficient) + countDifference) + compound
+            reactantList[i] = newCompound
+            break
+
+    return reactantList
+
+def elementsNotBalance(reactantDictionary, productDictionary):
+
+    elementListNotBalance = []
+
+    for (element, reactantCount) in reactantDictionary.items():
+        productCount = productDictionary[element]
+        if reactantCount > productCount:
+            elementListNotBalance.append([element, reactantCount - productCount, 'reactant'])
+        if productCount > reactantCount:
+            elementListNotBalance.append([element, productCount - reactantCount, 'product'])
+
+    return elementListNotBalance
+
+def resetCoefficient(reactantList, productList):
+    for i in range(len(reactantList)):
+        compound = reactantList[i]
+        compoundResult = getCoefficient(compound)
+        reactantList[i] = compoundResult[1]
+
+    for i in range(len(productList)):
+        compound = productList[i]
+        compoundResult = getCoefficient(compound)
+        productList[i] = compoundResult[1]
+
+    return (reactantList, productList)
+
+def printBalanceEquation(finalReactantList, finalProductList):
+    reactantString = finalReactantList[0]
+
+    if len(finalReactantList) > 1:
+        reactantString = reactantString + ' + ' + finalReactantList[1]
+
+    productString = finalProductList[0]
+
+    if len(finalProductList) > 1:
+        productString = productString + ' + ' + finalProductList[1]
+    
+    print(reactantString + ' -> ' + productString)
+
+
 if __name__ == "__main__":
-    (reactant_list, product_list) = getUserInput()
-    checkChemicalBalance(reactant_list, product_list)
+    (reactantList, productList) = getUserInput()
+    balance = checkChemicalBalance(reactantList, productList)
+    if balance:
+        print("Your chemical equation is already balanced!")
+    else:
+        print("Your chemical equation was not balanced. Here's the balance equation: ")
+        (resetReactantList, resetProductList) = resetCoefficient(reactantList, productList)
+        (finalReactantList, finalProductList)= balanceChemicalEquation(resetReactantList, resetProductList)
+        printBalanceEquation(finalReactantList, finalProductList)
+
     #print(item)
 
-
+""" here ------
 numReactants = int(input("Enter the number of reactants (Enter 1 or 2): ")) #Ask the number of reactants
 numProducts = int(input("Enter the number of products (Enter 1 or 2): ")) #Ask the number of products
 
@@ -451,6 +583,7 @@ if numProducts == 2: #The code runs if numProducts is 2
         index += 1 #Increment the index value by 1
 print(productElements)
 """
+""" here ------
 #Need help on line 170 to line 194
 needCoefficientReactants = {}
 needCoefficientProducts = {}
@@ -486,7 +619,7 @@ print(needCoefficientProducts)
                 productElements[key] *= multiplier2
                 multiplier2 += 1
 """
-
+""" here ------
 numBalanced = 0
 for key, value in reactantElements.items():
     if value == productElements.get(key):
@@ -507,4 +640,5 @@ if balanced == True: #Runs when the chemical equation is already balanced
         print(reactant1 + " -> " + product1) #Print the statement
     else: #Runs when numReactants is 2 and numProducts is 2
         print(reactant1 + " + " + reactant2 + " -> " + product1 + " + " + product2) #Print the statement
+here """
 
