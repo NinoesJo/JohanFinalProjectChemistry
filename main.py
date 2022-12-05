@@ -10,12 +10,12 @@ def getUserInput():
     #Grab number of reactants and products
     ######################################
     numReactants = input("Enter the number of reactants (Enter 1 or 2): ")
-    while not numReactants.isdigit() and numReactants != 1 and numReactants != 2:
+    while not numReactants.isdigit() or (int(numReactants) != 1 and int(numReactants) != 2):
         print('Invalid input, please try again\n')
         numReactants = input("Enter the number of reactants (Enter 1 or 2): ")
 
     numProducts = input("Enter the number of products (Enter 1 or 2): ")
-    while not numProducts.isdigit() and numProducts != 1 and numProducts != 2:
+    while not numProducts.isdigit() or (int(numProducts) != 1 and int(numProducts) != 2):
         print('Invalid input, please try again\n')
         numProducts = input("Enter the number of products (Enter 1 or 2): ")
     
@@ -250,9 +250,7 @@ def balanceChemicalEquation(reactantList, productList):
             reactantDictionary, productDictionary = grabMergeCompoundDictionary(reactantListUpdate, productList)
             finalReactantList = reactantListUpdate
             balance = checkChemicalBalance(reactantListUpdate, productList)
-        
-        print(finalReactantList, finalProducList)
-        
+                
     return (finalReactantList, finalProducList)
 
 def updateProducts(element, productList):
