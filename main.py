@@ -3,6 +3,14 @@ Notify the user if their equation is balanced or not and then balance the equati
 Author: Johan Nino Espino
 Creation Date: 11/29/2022
 """
+#
+def lcm_array(list):
+    lcm = list[0]
+    for index in range(1, len(list)):
+        lcm = lcm * list[index] // math.gcd(lcm, list[index])
+    return lcm
+#
+
 import re
 from sympy import *
 from fractions import Fraction
