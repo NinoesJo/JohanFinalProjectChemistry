@@ -92,4 +92,4 @@ Enter the second product: 5C2
 
 Output:
 Your chemical equation is not balanced.
-2Fe3C2 + 12Cu2 -> 6FeCu4 + 3C2
+6Fe3C2 + 12Cu2 -> 6FeCu4 + 3C2
