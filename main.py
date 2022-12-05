@@ -4,6 +4,9 @@ Author: Johan Nino Espino
 Creation Date: 11/29/2022
 """
 import re
+from sympy import *
+from fractions import Fraction
+import math
 
 def getUserInput():
     ######################################
@@ -224,7 +227,7 @@ def getCoefficient(compound):
         return (1, compound)
     return (compound[:i], compound[i:])
 
-
+# REMOVE
 def balanceChemicalEquation(reactantList, productList):
     
     reactantDictionary, productDictionary = grabMergeCompoundDictionary(reactantList, productList)
@@ -253,6 +256,7 @@ def balanceChemicalEquation(reactantList, productList):
                 
     return (finalReactantList, finalProducList)
 
+# REMOVE
 def updateProducts(element, productList):
     elementType = element[0]
     countDifference = element[1]
@@ -282,6 +286,7 @@ def updateProducts(element, productList):
 
     return productList
 
+#REMOVE
 def updateReactants(element, reactantList):
     elementType = element[0]
     countDifference = element[1]
@@ -311,6 +316,7 @@ def updateReactants(element, reactantList):
 
     return reactantList
 
+# REMOVE
 def elementsNotBalance(reactantDictionary, productDictionary):
 
     elementListNotBalance = []
@@ -324,16 +330,259 @@ def elementsNotBalance(reactantDictionary, productDictionary):
 
     return elementListNotBalance
 
+
+def balanceEquations(resetReactantList, resetProductList):
+    equations = createSystemOfEquations(resetReactantList, resetProductList)
+    (matrix, usedLetters) = createMatrix(equations)
+
+    for subMatrix in matrix:
+        if subMatrix[-2] == 0 and subMatrix != matrix[-1]:
+            print('Equation cannot be balanced')
+
+            for i in range(len(resetReactantList)):
+                resetReactantList[i] = resetReactantList[i][1:]
+            
+            for i in range(len(resetProductList)):
+                resetProductList[i] = resetProductList[i][1:]
+            return (resetReactantList, resetProductList)
+    
+    valueForVariable = {}
+    for letter in usedLetters:
+        valueForVariable[letter] = 0
+
+    valueForVariable['a'] = matrix[0][-2]
+    
+    if 'b' in usedLetters:
+        valueForVariable['b'] = matrix[1][-2]
+
+    if 'c' in usedLetters and 'd' in usedLetters:
+        if 'b' not in usedLetters:
+            valueForVariable['c'] = matrix[1][-2]
+        else:
+            valueForVariable['c'] = matrix[2][-2]
+
+    # SOLVE FOR MISSING VARIABLE
+    if 'd' in usedLetters:
+        valueForVariable = solveForMissingVariable(equations, valueForVariable, usedLetters, 'd')
+    else:
+        valueForVariable = solveForMissingVariable(equations, valueForVariable, usedLetters, 'c')
+
+    lcm = leastCommonMultiple(valueForVariable)
+
+    for variable, value in valueForVariable.items():
+        valueForVariable[variable] = value*lcm
+
+    #UPDATE
+    for i in range(len(resetReactantList)):
+        reactant = resetReactantList[i][1:]
+        if i == 0:
+            if valueForVariable['a'] > 1:
+                resetReactantList[i] = str(valueForVariable['a']) + reactant
+            else:
+                resetReactantList[i] = reactant
+
+        else:
+            if valueForVariable['b'] > 1:
+                resetReactantList[i] = str(valueForVariable['b']) + reactant
+            else:
+                resetReactantList[i] = reactant
+
+    for i in range(len(resetProductList)):
+        product = resetProductList[i][1:]
+        
+        if i == 0:
+            if valueForVariable['c'] > 1:
+                resetProductList[i] = str(valueForVariable['c']) + product
+            else:
+                resetProductList[i] = product
+        else:
+            if valueForVariable['d'] > 1:
+                resetProductList[i] = str(valueForVariable['d']) + product
+            else:
+                resetProductList[i] = product
+
+    return (resetReactantList, resetProductList)
+
+def solveForMissingVariable(equations, valueForVariable, usedLetters, letterTarget):
+    coefficientForVariable = {}
+    
+    for equation in equations.values():
+        if equation.find(letterTarget) > -1:
+            for letter in usedLetters:
+                if equation.find(letter) > -1:
+                    index = equation.find(letter[0])
+                    coefficient = getCoefficientEquation(equation, index)
+                        
+                    if letter != letterTarget:
+                        coefficientForVariable[letter] = -1*coefficient
+                    else:
+                        coefficientForVariable[letter] = coefficient
+            break
+                
+    numerator = 0
+    denominator = 0
+    for letter, coefficient in coefficientForVariable.items():
+        if letter != letterTarget:
+            numerator += coefficient * valueForVariable[letter]
+
+        else:
+            denominator += coefficient
+        
+    valueForVariable[letterTarget] = numerator/denominator
+    return valueForVariable
+
+def leastCommonMultiple(valueForVariables):
+    denominatorList = []
+    negative = False
+    for values in valueForVariables.values():
+        if values < 0:
+            negative = True
+        denominatorList.append(Fraction(values).denominator)
+    
+    lcm = 0
+    if len(denominatorList) == 4:
+        lcm = math.lcm(denominatorList[0], denominatorList[1], denominatorList[2], denominatorList[3])
+    elif len(denominatorList) == 3:
+        lcm = math.lcm(denominatorList[0], denominatorList[1], denominatorList[2])
+    else:
+        lcm = math.lcm(denominatorList[0], denominatorList[1])
+
+    if negative:
+        lcm *= -1
+    
+    return lcm
+
+
+def createMatrix(equationsDictionary):
+    usedLetters = {'a': False, 'b': False, 'c': False, 'd': False}
+    matrix = []
+
+    for equation in equationsDictionary.values():
+        for letter in usedLetters:
+            if equation.find(letter) > -1:
+                usedLetters[letter] = True
+    
+    #Remove unused variables
+    lettersToRemove = [letter for letter, used in usedLetters.items() if used == False]
+
+    for letter in lettersToRemove:
+        del usedLetters[letter]
+
+    for equation in equationsDictionary.values():
+        subMatrix = [0] * (len(usedLetters) + 1)
+
+        i = 0
+        for letter in usedLetters:
+            if equation.find(letter[0]) > -1:
+                index = equation.find(letter[0])
+                coefficient = getCoefficientEquation(equation, index) 
+                subMatrix[i] = coefficient
+            
+            i += 1
+
+        matrix.append(subMatrix)
+
+    resultMatrix = Matrix(matrix).rref()[0]
+    finalMatrix = []
+    
+    subMatrix = [0] * (len(usedLetters) + 1)
+    for i in range(len(resultMatrix)):
+        if (i+1) % len(subMatrix) == 0:
+            finalMatrix.append(subMatrix)
+            subMatrix = [0] * (len(usedLetters) + 1)
+        
+        subMatrix[i % len(subMatrix)] = resultMatrix[i]
+    return (finalMatrix, usedLetters)
+
+def getCoefficientEquation(equation, index):
+    if index == 0:
+        return 1
+
+    i = index - 1
+    while i > -1:
+        number = equation[i]
+        if number.isdigit() or number == '-' or number == '+':
+            i-=1
+            continue
+        break
+    
+    if equation[i+1: index] == '-':
+        return -1
+    
+    if equation[i+1: index] == '+':
+        return 1
+
+    return int(equation[i+1: index])
+
+def createSystemOfEquations(resetReactantList, resetProductList):
+
+    (reactantDictionary, productDictionary) = grabMergeCompoundDictionary(reactantList, productList)
+    systemOfEquationsDictionary = {}
+    
+    for i in range(len(resetReactantList)):
+        reactant = resetReactantList[i]
+
+        for element in reactantDictionary:            
+            compoundDictionary = createCompoundDictionary(reactant)       
+            
+            if element in compoundDictionary:
+                index = reactant.find(element) + len(element)
+                subscript = grabSubscript(reactant, index)
+
+                subgroups = createSubgroups(reactant.replace(')', ' ').replace('(', ' ').split())
+                outerSubscript = [outer_subscript for (subcompound, outer_subscript) in subgroups if subcompound.find(element) > -1][0]
+
+                if subscript*outerSubscript == 1:
+                    subscript = ""
+                else:
+                     subscript *= outerSubscript
+
+                if element in systemOfEquationsDictionary:
+                    systemOfEquationsDictionary[element] += '+' + str(subscript) + reactant[0]
+                else:
+                    systemOfEquationsDictionary[element] = str(subscript) + reactant[0]
+
+    for i in range(len(resetProductList)):
+        product = resetProductList[i]
+
+        for element in productDictionary:
+            compoundDictionary = createCompoundDictionary(product)       
+            
+            if element in compoundDictionary:
+                index = product.find(element) + len(element)
+                subscript = grabSubscript(product, index)
+
+                subgroups = createSubgroups(product.replace(')', ' ').replace('(', ' ').split())
+                outerSubscript = [int(outer_subscript) for (subcompound, outer_subscript) in subgroups if subcompound.find(element) > -1][0]
+
+                if subscript*outerSubscript == 1:
+                    subscript = ""
+                else:
+                     subscript *= outerSubscript
+
+                systemOfEquationsDictionary[element] += '-' + str(subscript) + product[0]
+
+    for element in systemOfEquationsDictionary:
+        systemOfEquationsDictionary[element] += ' = 0'
+
+    return systemOfEquationsDictionary
+
 def resetCoefficient(reactantList, productList):
     for i in range(len(reactantList)):
         compound = reactantList[i]
         compoundResult = getCoefficient(compound)
-        reactantList[i] = compoundResult[1]
+        if i == 0:
+            reactantList[i] = 'a' + compoundResult[1]
+        else:
+            reactantList[i] = 'b' + compoundResult[1]
 
     for i in range(len(productList)):
         compound = productList[i]
         compoundResult = getCoefficient(compound)
-        productList[i] = compoundResult[1]
+        if i == 0:
+            productList[i] = 'c' + compoundResult[1]
+        else:
+            productList[i] = 'd' + compoundResult[1]
 
     return (reactantList, productList)
 
@@ -350,7 +599,6 @@ def printBalanceEquation(finalReactantList, finalProductList):
     
     print(reactantString + ' -> ' + productString)
 
-
 if __name__ == "__main__":
     (reactantList, productList) = getUserInput()
     balance = checkChemicalBalance(reactantList, productList)
@@ -359,7 +607,8 @@ if __name__ == "__main__":
     else:
         print("Your chemical equation was not balanced. Here's the balance equation: ")
         (resetReactantList, resetProductList) = resetCoefficient(reactantList, productList)
-        (finalReactantList, finalProductList)= balanceChemicalEquation(resetReactantList, resetProductList)
+        (finalReactantList, finalProductList) = balanceEquations(resetReactantList, resetProductList)
+        #(finalReactantList, finalProductList)= balanceChemicalEquation(resetReactantList, resetProductList)
         printBalanceEquation(finalReactantList, finalProductList)
 
     #print(item)
