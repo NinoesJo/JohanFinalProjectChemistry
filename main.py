@@ -446,14 +446,16 @@ def leastCommonMultiple(valueForVariables):
         if values < 0:
             negative = True
         denominatorList.append(Fraction(values).denominator)
-    
-    lcm = 0
-    if len(denominatorList) == 4:
-        lcm = math.lcm(denominatorList[0], denominatorList[1], denominatorList[2], denominatorList[3])
-    elif len(denominatorList) == 3:
-        lcm = math.lcm(denominatorList[0], denominatorList[1], denominatorList[2])
-    else:
-        lcm = math.lcm(denominatorList[0], denominatorList[1])
+        
+    lcm = denominatorList[0]
+    for index in range(1, len(denominatorList)):
+        lcm = lcm * denominatorList[index] // math.gcd(lcm, denominatorList[index])
+    # if len(denominatorList) == 4:
+    #     lcm = math.lcm(denominatorList[0], denominatorList[1], denominatorList[2], denominatorList[3])
+    # elif len(denominatorList) == 3:
+    #     lcm = math.lcm(denominatorList[0], denominatorList[1], denominatorList[2])
+    # else:
+    #     lcm = math.lcm(denominatorList[0], denominatorList[1])
 
     if negative:
         lcm *= -1
